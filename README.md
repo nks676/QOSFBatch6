@@ -1,6 +1,10 @@
 # QOSFBatch6
+# Quantum-TSP-Solver
 QAOA Research Project
 
+
+TSP solver using QAOA. Finds approximate solution to Traveling Salesman Problem. Written in python(qiskit), efficient and quantum-inspired approach. Finds optimal route with minimum distance.
+ here's an explanation of the code line by line:
 first function 
 This code defines the function create_cost_Hamiltonian(distances) which creates the cost Hamiltonian for the TSP.
 
@@ -52,7 +56,9 @@ The twenty-fifth line starts another for loop that will iterate over the number 
 The twenty-sixth line measures qubit j of the quantum register and stores the result in the classical register.
 The twenty-seventh line is the end of the function definition and it returns the quantum circuit object qc.
 In summary, this function creates a quantum circuit that implements the QAOA algorithm for the TSP problem. The function creates quantum and classical registers, quantum circuit object, cost and mixer Hamiltonians, then iterates over the number of steps 'p' applying the cost and mixer Hamiltonians using cx, p, h and x gates and also includes measurements on all qubits. This circuit can be executed on a quantum computer or simulator to obtain the optimal solution for the TSP problem.
-_________________________________________________________________________________________________________________________-
+________________________________________________________________________________________________________________________
+
+The Driver code starts here
 This code is using the QAOA circuit that was created earlier and executing it on a simulator backend to obtain the results.
 
 The first two lines define two lists. The first list cities is a list of city names, and the second list distances is a 2D array representing the distance between the cities.
