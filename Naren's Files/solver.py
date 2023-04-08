@@ -8,16 +8,10 @@ from pyquil.gates import X
 import itertools
 
 import scipy.optimize
-import TSP_utilities
+import functions
 import pdb
 
 class ForestTSPSolver(object):
-    """
-    Class for solving Travelling Salesman Problem (with starting point) using Forest - quantum computing library.
-    It uses QAOA method with operators as described in the following paper:
-    https://arxiv.org/pdf/1709.03489.pdf by Stuart Hadfield et al.
-    
-    """
     def __init__(self, distance_matrix, steps=2, ftol=1.0e-3, xtol=1.0e-3, initial_state="all", starting_node=0):
 
         self.distance_matrix = distance_matrix
@@ -63,43 +57,29 @@ class ForestTSPSolver(object):
                               store_basis=True)
         
     def solve_tsp(self):
-        """
-        Calculates the optimal angles (betas and gammas) for the QAOA algorithm 
-        and returns a list containing the order of nodes.
-        """
         self.find_angles()
         self.calculate_solution()
         return self.solution, self.distribution
 
     def find_angles(self):
-        """
-        Runs the QAOA algorithm for finding the optimal angles.
-        """
         self.betas, self.gammas = self.qaoa_inst.get_angles()
         return self.betas, self.gammas
 
     def calculate_solution(self):
-        """
-        Samples the QVM for the results of the algorithm 
-        and returns a list containing the order of nodes.
-        """
         most_frequent_string, sampling_results = self.qaoa_inst.get_string(self.betas, self.gammas, samples=10000)
-        reduced_solution = TSP_utilities.binary_state_to_points_order(most_frequent_string)
+        reduced_solution = functions.binary_state_to_points_order(most_frequent_string)
         full_solution = self.get_solution_for_full_array(reduced_solution)
         self.solution = full_solution
         
         all_solutions = sampling_results.keys()
         distribution = {}
         for sol in all_solutions:
-            reduced_sol = TSP_utilities.binary_state_to_points_order(sol)
+            reduced_sol = functions.binary_state_to_points_order(sol)
             full_sol = self.get_solution_for_full_array(reduced_sol)
             distribution[tuple(full_sol)] = sampling_results[sol]
         self.distribution = distribution
 
     def get_solution_for_full_array(self, reduced_solution):
-        """
-        Transforms the solution from its reduced version to the full initial version.
-        """
         full_solution = reduced_solution
         for i in range(len(full_solution)):
             if full_solution[i] >= self.starting_node:
@@ -108,9 +88,6 @@ class ForestTSPSolver(object):
         return full_solution
 
     def create_phase_separator(self):
-        """
-        Creates phase-separation operators, which depend on the objective function.
-        """
         cost_operators = []
         reduced_distance_matrix = np.delete(self.distance_matrix, self.starting_node, axis=0)
         reduced_distance_matrix = np.delete(reduced_distance_matrix, self.starting_node, axis=1)
@@ -139,11 +116,6 @@ class ForestTSPSolver(object):
         return phase_separator
 
     def create_mixer(self):
-        """
-        Creates mixing operators, which depend on the structure of the problem.
-        Indexing comes directly from 4.1.2 from the  https://arxiv.org/pdf/1709.03489.pdf article, 
-        equations 54 - 58.
-        """
         mixer_operators = []
 
         for t in range(self.reduced_number_of_nodes - 1):
