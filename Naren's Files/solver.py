@@ -139,12 +139,6 @@ class ForestTSPSolver(object):
         return mixer_operators
 
     def create_initial_state_program(self, initial_state):
-        """
-        Creates a pyquil program representing the initial state for the QAOA.
-        As an argument it takes either a list with order of the cities, or 
-        a string "all". In the second case the initial state is superposition
-        of all possible states for this problem.
-        """
         initial_state_program = pq.Program()
         if type(initial_state) is list:
             for i in range(self.reduced_number_of_nodes):
